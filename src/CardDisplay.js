@@ -1,5 +1,6 @@
 import React from 'react';
 import './CardDisplay.css';
+import Spinner from './Spinner';
 
 const baseApi = '';
 const getLastTimeApi = baseApi + '/api/lastEatTime';
@@ -18,7 +19,7 @@ function durationToString(sec_num) {
 }
 
 class CardDisplay extends React.Component {
-    state = {timeDiffString: durationToString(0), lastEatTimestamp: null};
+    state = {timeDiffString: null, lastEatTimestamp: null};
 
     componentDidMount(){
         this.updateLastEatTimeDiffSeconds();
@@ -31,13 +32,21 @@ class CardDisplay extends React.Component {
         }, 100);
     }
 
+    renderBody(){
+        if (this.state.timeDiffString) {
+            return (
+                <div className="card">
+                    <h3 className="time-string">{this.state.timeDiffString}</h3>
+                    <button className="eat-button" onClick={this.submitEat}>Eat</button>
+                </div>
+            );
+        }
+        
+        return <Spinner />
+    }
+
     render() {
-        return (
-            <div className="card">
-                <h3 className="time-string">{this.state.timeDiffString}</h3>
-                <button className="eat-button" onClick={this.submitEat}>Eat</button>
-            </div>
-        );
+        return this.renderBody();
     }
 
     updateTimeDiffString() {
