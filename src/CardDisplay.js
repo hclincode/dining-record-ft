@@ -19,7 +19,7 @@ function durationToString(sec_num) {
 }
 
 class CardDisplay extends React.Component {
-    state = {timeDiffString: null, lastEatTimestamp: null};
+    state = {timeDiffString: null, lastEatTimestamp: null, errorMsg: null};
 
     componentDidMount(){
         this.updateLastEatTimeDiffSeconds();
@@ -33,6 +33,10 @@ class CardDisplay extends React.Component {
     }
 
     renderBody(){
+        if (this.state.errorMsg) {
+            return <Spinner text={this.state.errorMsg}/>
+        }
+
         if (this.state.timeDiffString) {
             return (
                 <div className="card">
@@ -50,6 +54,7 @@ class CardDisplay extends React.Component {
     }
 
     updateTimeDiffString() {
+        if (!this.state.lastEatTimestamp) return;
         const durationSecond = nowUnixTimestamp() - this.state.lastEatTimestamp;
         this.setState({timeDiffString: durationToString(durationSecond)})
     }
@@ -66,12 +71,15 @@ class CardDisplay extends React.Component {
 
     // "this" binding issue. ref: https://zh-hant.reactjs.org/docs/handling-events.html
     submitEat = () => {
+        this.setState({timeDiffString: null, lastEatTimestamp: null});
         fetch(updateEatTimeApi).then((res)=>{
-            setTimeout(() => {
+            if (res.ok){
                 this.updateLastEatTimeDiffSeconds();
-            }, 100);
+            } else {
+                this.setState({errorMsg: 'Fail to upate eat time: (' + res.status + ') ' + res.statusText});
+            }
         }).catch((err) => {
-            alert(err);
+            this.setState({errorMsg: err});
         });
     }
 

@@ -2,9 +2,13 @@ import React from 'react';
 
 function Spinner(props) {
     return (
+        
         <div className="ui active dimmer">
-            <div className="ui text loader">{props.text}</div>
+            <a href=".">
+                <div className="ui text loader">{props.text}</div>
+            </a>
         </div>
+        
     );
 }
 
